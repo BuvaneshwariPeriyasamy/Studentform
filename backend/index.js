@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const mysql = require('mysql2')
+const mysql = require('mysql2');
 
 const app = express();
 app.use(bodyParser.json());
@@ -20,7 +20,7 @@ app.options("*", cors(corsOptions));
 const db = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: 'Buvana@652', 
+    password: 'Buvana@652',
     database: 'user_registration',
 });
 
@@ -37,14 +37,15 @@ const formatDate = (dob) => {
     return date.toISOString().split('T')[0]; // Format to YYYY-MM-DD
 };
 
+// Route to register a student
 app.post("/register", (req, res) => {
-    const { firstName, lastName, email, dob } = req.body;
-    const formattedDob = formatDate(dob); // Format dob
+    const { firstName, lastName, email, dob, rollNumber } = req.body;
+    const formattedDob = formatDate(dob);
 
     console.log("Incoming data:", req.body);
 
-    const query = 'INSERT INTO user (firstName, lastName, email, dob) VALUES (?, ?, ?, ?)';
-    db.query(query, [firstName, lastName, email, formattedDob], (error, results) => {
+    const query = 'INSERT INTO user (firstName, lastName, email, dob, rollNumber) VALUES (?, ?, ?, ?, ?)';
+    db.query(query, [firstName, lastName, email, formattedDob, rollNumber], (error, results) => {
         if (error) {
             console.error('Error inserting data:', error.message);
             return res.status(500).json({ error: 'Database error' });
@@ -53,6 +54,7 @@ app.post("/register", (req, res) => {
     });
 });
 
+// Route to get all students
 app.get("/users", (req, res) => {
     const query = 'SELECT * FROM user';
     db.query(query, (error, results) => {
@@ -64,10 +66,11 @@ app.get("/users", (req, res) => {
     });
 });
 
+// Route to delete a student by ID
 app.delete("/delete/:id", (req, res) => {
     const studentId = req.params.id;
-    
     const query = 'DELETE FROM user WHERE id = ?';
+
     db.query(query, [studentId], (error, results) => {
         if (error) {
             console.error('Error deleting data:', error.message);
@@ -77,19 +80,22 @@ app.delete("/delete/:id", (req, res) => {
     });
 });
 
+// Route to update student details
 app.put('/update/:id', (req, res) => {
     const { id } = req.params;
-    const { firstName, lastName, email, dob } = req.body;
+    const { firstName, lastName, email, dob, rollNumber } = req.body;
 
-    if (!firstName || !lastName || !email || !dob) {
+    // Check for required fields
+    if (!firstName || !lastName || !email || !dob || !rollNumber) {
         return res.status(400).send({ message: 'Missing fields in the request body' });
     }
 
-    const formattedDob = formatDate(dob); // Format dob
+    // Format the date
+    const formattedDob = formatDate(dob);
 
-    const sql = 'UPDATE user SET firstName = ?, lastName = ?, email = ?, dob = ? WHERE id = ?';
+    const sql = 'UPDATE user SET firstName = ?, lastName = ?, email = ?, dob = ?, rollNumber = ? WHERE id = ?';
 
-    db.query(sql, [firstName, lastName, email, formattedDob, id], (err, result) => {
+    db.query(sql, [firstName, lastName, email, formattedDob, rollNumber, id], (err, result) => {
         if (err) {
             console.error('Error updating student:', err.message, err.stack);
             return res.status(500).send({ message: 'Error updating student data' });
@@ -103,6 +109,8 @@ app.put('/update/:id', (req, res) => {
     });
 });
 
+
+// Start the server
 app.listen(5001, () => {
     console.log("Server started on port 5001...");
 });

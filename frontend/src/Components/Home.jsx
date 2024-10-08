@@ -7,7 +7,7 @@ import dayjs from 'dayjs';
 const Home = () => {
     const [students, setStudents] = useState([]);
     const [editStudent, setEditStudent] = useState(null);
-    const [formData, setFormData] = useState({ firstName: '', lastName: '', email: '', dob: '' });
+    const [formData, setFormData] = useState({ firstName: '', lastName: '', email: '', dob: '' ,roll:''});
     const navigate = useNavigate();
     const [showMenu, setShowMenu] = useState(false);
 
@@ -45,6 +45,7 @@ const Home = () => {
             lastName: student.lastName,
             email: student.email,
             dob: dobFormatted,
+            rollNumber: student.rollNumber,
         });
     };
 
@@ -133,6 +134,7 @@ const Home = () => {
                                 <table className="w-full text-xl text-left">
                                     <tbody>
                                         <tr className="border-b">
+                                        <td className="py-2">{student.rollNumber}</td>
                                             <td className="py-2">{student.firstName} {student.lastName}</td>
                                             <td className="py-2">{student.email}</td>
                                             <td className="py-2">{formatDate(student.dob)}</td> {/* Format the date */}
@@ -192,6 +194,16 @@ const Home = () => {
                                     type="email"
                                     name="email"
                                     value={formData.email}
+                                    onChange={handleInputChange}
+                                    className="border rounded w-full py-2 px-3"
+                                />
+                            </div>
+                            <div className="mb-4">
+                                <label className="block font-bold mb-2">Roll Number</label>
+                                <input
+                                    type="text"
+                                    name="rollNumber"
+                                    value={formData.rollNumber}
                                     onChange={handleInputChange}
                                     className="border rounded w-full py-2 px-3"
                                 />
